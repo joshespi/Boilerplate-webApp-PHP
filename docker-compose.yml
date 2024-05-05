@@ -1,0 +1,45 @@
+services:
+  php_port:
+    build:
+      context: .
+      dockerfile: php.Dockerfile
+    env_file: .env
+    volumes:
+      - ./app:/var/www/html
+      - /var/www/html/vendor
+    ports:
+      - "8083:80"
+    depends_on:
+      - port_db
+    networks:
+      - port_network
+
+  port_db:
+    image: mariadb:11.2
+    volumes:
+      - ./db_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    environment:
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MARIADB_DATABASE: ${DB_NAME}
+      MARIADB_USER: ${DB_USER}
+      MARIADB_PASSWORD: ${DB_PASS}
+      TZ: America/Denver
+    ports:
+      - "3313:3306"
+    networks:
+      - port_network
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    environment:
+      PMA_HOST: port_db
+    ports:
+      - "8088:80"
+    depends_on:
+      - port_db
+    networks:
+      - port_network
+
+networks:
+  port_network:
