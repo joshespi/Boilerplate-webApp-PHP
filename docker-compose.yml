@@ -31,7 +31,7 @@ services:
       - port_network
 
   phpmyadmin:
-    image: phpmyadmin/phpmyadmin
+    image: phpmyadmin:latest
     environment:
       PMA_HOST: port_db
     ports:
